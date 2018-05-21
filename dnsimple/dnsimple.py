@@ -147,7 +147,7 @@ class DNSimple(object):
                 self._account_id = account_info['id']
         return self._account_id
 
-    def __rest_helper(self, url, data=None, params=None, method='GET', account_link=True):
+    def __rest_helper(self, url, data=None, params=None, method='GET', account_link=True, verbose=False):
         """
         Handles requests to the DNSimple API, defaults to GET requests if none
         provided.
@@ -169,7 +169,7 @@ class DNSimple(object):
 
         prepared_request = request.prepare()
 
-        r_json, r_headers = self.__request_helper(prepared_request)
+        r_json, r_headers = self.__request_helper(prepared_request, verbose=verbose)
 
         if r_headers is not None:
             self.ratelimit_limit = r_headers['X-RateLimit-Limit']
@@ -179,7 +179,7 @@ class DNSimple(object):
         return r_json
 
     @staticmethod
-    def __request_helper(request):
+    def __request_helper(request, verbose):
         """Handles firing off requests and exception raising."""
         try:
             session = Session()
@@ -201,7 +201,10 @@ class DNSimple(object):
         if 400 <= handle.status_code:
             raise DNSimpleException(response)
 
-        return response['data'], handle.headers
+        if verbose:
+          return response, handle.headers
+        else:
+          return response['data'], handle.headers
 
     def __add_backward_compatibility(self, data, key):
         """
@@ -216,11 +219,11 @@ class DNSimple(object):
 
     # DOMAINS
 
-    def domains(self, params=None):
+    def domains(self, params=None, verbose=False):
         """
         Get a list of all domains in your account.
         """
-        result = self.__rest_helper('/domains', method='GET', params=params)
+        result = self.__rest_helper('/domains', method='GET', params=params, verbose=verbose)
         return self.__add_backward_compatibility(result, 'domain')
 
     getdomains = domains  # Alias for backwards-compatibility
@@ -287,9 +290,9 @@ class DNSimple(object):
 
     # RECORDS
 
-    def records(self, id_or_domain_name, params=None):
+    def records(self, id_or_domain_name, params=None, verbose=False):
         """ Get the list of records for the specific domain """
-        result = self.__rest_helper('/zones/{name}/records'.format(name=id_or_domain_name), method='GET', params=params)
+        result = self.__rest_helper('/zones/{name}/records'.format(name=id_or_domain_name), method='GET', params=params, verbose=verbose)
         return self.__add_backward_compatibility(result, 'record')
 
     getrecords = records  # Alias for backwards-compatibility
@@ -352,9 +355,9 @@ class DNSimple(object):
 
     # # CONTACTS
 
-    def contacts(self, params=None):
+    def contacts(self, params=None, verbose=False):
         """Get a list of all domain contacts in your account."""
-        return self.__rest_helper('/contacts', method='GET', params=params)
+        return self.__rest_helper('/contacts', method='GET', params=params, verbose=verbose)
 
     def contact(self, contact_id):
         """Get a domain contact."""
