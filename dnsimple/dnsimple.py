@@ -216,11 +216,11 @@ class DNSimple(object):
 
     # DOMAINS
 
-    def domains(self):
+    def domains(self, params=None):
         """
         Get a list of all domains in your account.
         """
-        result = self.__rest_helper('/domains', method='GET')
+        result = self.__rest_helper('/domains', method='GET', params=params)
         return self.__add_backward_compatibility(result, 'domain')
 
     getdomains = domains  # Alias for backwards-compatibility
@@ -287,9 +287,9 @@ class DNSimple(object):
 
     # RECORDS
 
-    def records(self, id_or_domain_name):
+    def records(self, id_or_domain_name, params=None):
         """ Get the list of records for the specific domain """
-        result = self.__rest_helper('/zones/{name}/records'.format(name=id_or_domain_name), method='GET')
+        result = self.__rest_helper('/zones/{name}/records'.format(name=id_or_domain_name), method='GET', params=params)
         return self.__add_backward_compatibility(result, 'record')
 
     getrecords = records  # Alias for backwards-compatibility
@@ -352,9 +352,9 @@ class DNSimple(object):
 
     # # CONTACTS
 
-    def contacts(self):
+    def contacts(self, params=None):
         """Get a list of all domain contacts in your account."""
-        return self.__rest_helper('/contacts', method='GET')
+        return self.__rest_helper('/contacts', method='GET', params=params)
 
     def contact(self, contact_id):
         """Get a domain contact."""
